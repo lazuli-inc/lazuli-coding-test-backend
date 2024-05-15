@@ -9,7 +9,7 @@ import {
 @Entity('products')
 export class ProductEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ length: 500 })
   title: string;
@@ -21,17 +21,11 @@ export class ProductEntity {
   status: string;
 
   @CreateDateColumn()
-  createdAt: Timestamp;
+  createdAt?: Timestamp;
 
-  constructor(
-    title: string,
-    description: string,
-    status: string,
-    createdAt: Timestamp,
-  ) {
+  constructor(title: string, description: string, status: string) {
     this.title = title;
     this.description = description;
     this.status = status;
-    this.createdAt = createdAt;
   }
 }

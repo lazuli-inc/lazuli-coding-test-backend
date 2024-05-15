@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ProductModule } from './product/product.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ProductModule);
+  const app = await NestFactory.create(AppModule);
 
   const apiDocConfig = new DocumentBuilder()
     .setTitle('Product Api')
