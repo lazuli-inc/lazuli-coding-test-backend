@@ -9,6 +9,7 @@ import {
   UsePipes,
   ValidationPipe,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
@@ -16,12 +17,12 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiProduces,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ProductPatchDto, ProductPostDto } from './product.dto';
 import { ProductResponse, ProductListResponse } from './product.schema';
-import { ProductEntity } from './product.entity';
 
 @ApiTags('Product')
 @ApiProduces('application/json; charset=utf-8')
@@ -30,11 +31,19 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  @ApiExtraModels(ProductEntity)
   @ApiOkResponse({ type: ProductListResponse })
-  async list(): Promise<{ products: ProductEntity[] }> {
-    const products = await this.productService.getProducts();
-    return { products };
+  @ApiQuery({ name: 'token', required: false, type: Number })
+  async list(@Query('limit') limit: number, @Query('token') token?: number) {
+    const res = await this.productService.getProducts(
+      Number(limit),
+      token == null ? null : Number(token),
+    );
+    return {
+      total: res.count,
+      nextToken: res.nextToken,
+      limit: res.limit,
+      data: res.data,
+    };
   }
 
   @Post()

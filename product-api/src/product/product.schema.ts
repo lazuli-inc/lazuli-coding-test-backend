@@ -18,8 +18,17 @@ export class ProductResponse {
 }
 
 export class ProductListResponse {
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  nextToken: number | null;
+
+  @ApiProperty()
+  limit: number;
+
   @ApiProperty({
     type: [ProductResponse],
   })
-  products: ProductResponse;
+  data: ProductResponse;
 }

@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { ProductEntity } from './product.entity';
 
 @Injectable()
@@ -8,12 +8,55 @@ export class ProductService {
     @Inject('PRODUCT_REPOSITORY')
     private readonly productRepository: Repository<ProductEntity>,
   ) {}
-  async getProducts(): Promise<ProductEntity[]> {
-    return await this.productRepository.find({
+  async getProducts(
+    limit: number,
+    token?: number,
+  ): Promise<{
+    data: ProductEntity[];
+    count: number;
+    nextToken: number | null;
+    limit: number;
+  }> {
+    console.table({ limit, token });
+    let take = limit;
+    if (limit >= 100) {
+      console.log({ limit });
+      take = 100;
+    }
+    let where = {};
+    if (token != null) {
+      where = { id: LessThanOrEqual(token) };
+    }
+    const [products, count] = await this.productRepository.findAndCount({
+      where,
+      take: take + 1,
       order: {
         createdAt: 'DESC',
       },
     });
+
+    if (count === 0) {
+      return {
+        data: products,
+        count,
+        limit: take,
+        nextToken: null,
+      };
+    }
+
+    let data = products.slice(0, -1);
+    let nextToken = products[products.length - 1].id;
+    if (count <= take) {
+      data = products;
+      nextToken = null;
+    }
+
+    return {
+      data,
+      count,
+      limit: take,
+      nextToken: nextToken,
+    };
   }
 
   async getProduct(id: number): Promise<ProductEntity> {
