@@ -3,25 +3,24 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Body,
   UsePipes,
   ValidationPipe,
   HttpCode,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiOkResponse,
   ApiProduces,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ProductPatchDto, ProductPostDto } from './product.dto';
+import { ProductPutDto, ProductPostDto } from './product.dto';
 import { ProductResponse, ProductListResponse } from './product.schema';
 
 @ApiTags('Product')
@@ -60,9 +59,10 @@ export class ProductController {
     return await this.productService.getProduct(Number(id));
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOkResponse({ type: ProductResponse })
-  async patch(@Param('id') id: number, @Body() param: ProductPatchDto) {
+  @UsePipes(ValidationPipe)
+  async put(@Param('id') id: number, @Body() param: ProductPutDto) {
     return await this.productService.update(id, param);
   }
 

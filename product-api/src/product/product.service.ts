@@ -17,16 +17,16 @@ export class ProductService {
     nextToken: number | null;
     limit: number;
   }> {
-    console.table({ limit, token });
     let take = limit;
     if (limit >= 100) {
-      console.log({ limit });
       take = 100;
     }
+
     let where = {};
     if (token != null) {
       where = { id: LessThanOrEqual(token) };
     }
+
     const [products, count] = await this.productRepository.findAndCount({
       where,
       take: take + 1,
@@ -62,7 +62,7 @@ export class ProductService {
   async getProduct(id: number): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
-      throw new NotFoundException();
+      throw new NotFoundException({ message: 'Product not found' });
     }
     return product;
   }
@@ -74,20 +74,16 @@ export class ProductService {
   async update(id: number, param: ProductEntity): Promise<ProductEntity> {
     const target = await this.productRepository.findOne({ where: { id } });
     if (target == null) {
-      throw new NotFoundException();
+      throw new NotFoundException({ message: 'Product not found' });
     }
-    await this.productRepository.update(id, {
-      title: param.title ?? target.title,
-      description: param.description ?? target.description,
-      status: param.status ?? target.status,
-    });
+    await this.productRepository.update(id, param);
     return await this.productRepository.findOne({ where: { id } });
   }
 
   async delete(id: number): Promise<void> {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
-      throw new NotFoundException();
+      throw new NotFoundException({ message: 'Product not found' });
     }
     await this.productRepository.delete(id);
   }
