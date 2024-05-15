@@ -15,4 +15,4 @@ $ npm run start
 ```
 
 ## API Doc
-http://localhost:8080/api-doc
+http://localhost:3000/api-doc
